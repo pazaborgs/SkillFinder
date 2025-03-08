@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static %}
+{% block 'head' %}
+  <!--<link href="{% static 'styles/empresas_cadastradas.css' %}" rel="stylesheet" />-->
+{% endblock %}
+{% block 'body' %}
+  <div class="wrapper">
+    <div class="whitebox">
+      <div class="container-fluid">
+        {% if messages %}
+          {% for message in messages %}
+            <section class="alert {{ message.tags }}">
+              {{ message }}
+            </section>
+          {% endfor %}
+        {% endif %}
+        <div class="row pt-5 pb-5 border-bottom border-info header_box">
+          <div class="col-md-7 text-center mb-4 mb-md-0">
+            <h1 class="text-center m-0">Serviços Cadastrados</h1>
+          </div>
+          <div class="col-md-5 text-center mb-4 mb-md-0">
+            <a class="btn btn-primary whitebox__newcompanybtn"
+               href="{% url 'new_service' %}"
+               role="button">Cadastrar Serviço</a>
+          </div>
+        </div>
+      </div>
+      <form action="{% url 'my_services' %}" method="GET">
+        <div class="container p-4">
+          <div class="row">
+            <div class="col-md-8 mb-4 mb-md-0">
+              <input type="text"
+                     placeholder="Buscar Serviço"
+                     class="form-control"
+                     name="name" />
+            </div>
+            <div class="col-md-4 text-center mb-4 mb-md-0">
+              <input type="submit"
+                     value="Filtrar"
+                     class="btn btn-primary whitebox__filterbtn" />
+            </div>
+          </div>
+        </div>
+      </form>
+      <div class="table-responsive col-lg-12">
+        <table class="table table-striped table-hover p-5 align-items-center">
+          <thead>
+            <tr>
+              <th>Nome do Serviço</th>
+              <th>Faixa de Preço</th>
+              <th>Tipo de Serviço</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for service in services %}
+              <tr class="text-center m-0 align-middle">
+                <td>
+                  <a href="{% url 'single_service' service.id %}">{{ service.name }}</a>
+                </td>
+                <td>{{ service.price_range }}</td>
+                <td>{{ service.service_type }}</td>
+                <td>
+                  <a class="btn btn-primary whitebox__deletebtn text-center"
+                     href="{% url 'delete_service' service.id %}"
+                     role="button"><i class="ri-delete-bin-6-line"></i></a>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="4">Nenhum serviço encontrado.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}

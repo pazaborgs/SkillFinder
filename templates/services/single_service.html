@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block 'head' %}
+    <link href="{% static '/styles/nova_empresa.css' %}" rel="stylesheet">
+{% endblock%}
+
+{% block 'body' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Details</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center">Service Details</h2>
+        <div class="card">
+            <div class="card-header">
+                <h4>{{ service.name }}</h4>
+                <a href="{% url 'edit_service' service.id %}" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen" viewBox="0 0 16 16">
+                        <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001m-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708z"></path>
+                    </svg>
+                </a>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Service Type: {{ service.service_type }}</h5>
+                <p class="card-text"><strong>Price Range:</strong> {{ service.price_range }}</p>
+                <p class="card-text"><strong>Owner:</strong> {{ service.owner.username }}</p>
+            </div>
+            <div class="card-footer text-muted">
+                <a href="{% url 'my_services' %}" class="btn btn-secondary">Back to Services</a>
+                <a href="{% url 'delete_service' service.id %}" class="btn btn-danger">Delete Service</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+{% endblock%}

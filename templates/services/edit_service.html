@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block 'head' %}
+    <link href="{% static '/styles/nova_empresa.css' %}" rel="stylesheet">
+{% endblock%}
+
+{% block 'body' %}
+<!-- update_service.html -->
+<h2>Update Service: {{ service.name }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Update Service</button>
+</form>
+
+<a href="{% url 'my_services' %}">Cancel</a>
+
+{% endblock%}
