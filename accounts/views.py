@@ -1,22 +1,28 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from .forms import CustomUserCreationForm, LoginForm
-from django.contrib import messages
-from services.models import Service
+#from django.contrib import messages
+from services.models import Service, Notification
+from .models import CustomUser
 from django.conf import settings
 
 user = settings.AUTH_USER_MODEL
-
 
 def register(request):
     if request.method == "POST":
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save(commit=False)
+            user.save()
+            form.save_m2m()  # ManyToMany (service_types)
             return redirect("login")
+        else:
+            print(form.errors)
     else:
         form = CustomUserCreationForm()
-        return render(request, "accounts/register.html", {"form": form})
+    
+    return render(request, "accounts/register.html", {"form": form})
+
 
 
 def login_view(request):
@@ -44,19 +50,18 @@ def logout_view(request):
 
 def provider_interface(request):
     if request.user.is_authenticated:
-        services = Service.objects.filter(owner=request.user)
+        notifications = Notification.objects.filter(provider=request.user)
     else:
-        services = []
-
-    return render(request, "services/my_services.html", {"services": services})
+        notifications = []
+    return render(request, "services/provider_notification_list.html", {"notifications": notifications})
 
 
 def user_interface(request):
     if request.user.is_authenticated:
-        services = Service.objects.all()
+        providers = CustomUser.objects.filter(user_type = 'provider')
     else:
-        services = []
-    return render(request, "services/user_service_list.html", {"services": services})
+        providers = []
+    return render(request, "services/user_provider_list.html", {"providers": providers})
 
 
 def homepage(request):

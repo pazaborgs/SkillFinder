@@ -2,11 +2,14 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages import constants
 from django.shortcuts import get_object_or_404, redirect, render
-from services.forms import ServiceForm
+from services.forms import ServiceForm, ServiceRequestForm, ProviderFilterForm
 from django.conf import settings
-from .models import Service
+from .models import Service, ServiceRequest, Notification, CustomUser
+#from geopy.distance import geodesic
 
 user = settings.AUTH_USER_MODEL
+
+# PROVIDER STUFF ===
 
 @login_required
 def new_service(request):
@@ -32,35 +35,26 @@ def new_service(request):
             messages.add_message(request, constants.ERROR, 'Serviço não cadastrado')
             return render(request, 'services/new_service.html', {'form': form})
 
-def my_services(request):
-
+def provider_notification_list(request):
     user = request.user
+    notifications = Notification.objects.filter(provider=user)
 
-    name_filter = request.GET.get('name')
-    type_filter = request.GET.get('service_type')
-    services = Service.objects.filter(owner=user)
+    return render(request, 'services/provider_notification_list.html', {'notifications': notifications})
 
-    if name_filter:
-        services = services.filter(name__icontains = name_filter)
 
-    if type_filter:
-        services = services.filter(marketing_niche = type_filter)
+def provider_view_notification(request, id):
+    notification = get_object_or_404(Notification, id=id)
+    notification.is_read = True
+    notification.save()
     
-    types = Service.objects.values_list('service_type', flat=True).distinct()
-    
-    return render(request, 'services/my_services.html', {'services': services, 'types': types})
-
-
-def single_service(request, id):
-    service = get_object_or_404(Service, id=id)
-    return render(request, 'services/single_service.html', {'service': service}) 
+    return render(request, 'services/provider_view_notification.html', {'notification': notification}) 
     
 
-def delete_service(request, id):
-    service = get_object_or_404(Service, id=id)
-    service.delete()
-    messages.add_message(request, constants.SUCCESS, 'Serviço Excluido')
-    return redirect('my_services')
+def provider_delete_notification(request, id):
+    notification = get_object_or_404(Notification, id= id)
+    notification.delete()
+    messages.add_message(request, constants.SUCCESS, 'Notificação excluída com sucesso.')
+    return redirect('provider_notification_list')
 
 def edit_service(request, id):
     service = get_object_or_404(Service, id=id)
@@ -78,14 +72,74 @@ def edit_service(request, id):
 
     return render(request, 'services/edit_service.html', {'form': form, 'service': service})
 
-# User Views
+# USER VIEWS ===
 
-def user_service_list(request):
+def user_provider_list(request):
 
-    name_filter = request.GET.get('name')
-    services = Service.objects.all()
+    form = ProviderFilterForm(request.GET)
+    providers = CustomUser .objects.filter(user_type='provider')
 
-    if name_filter:
-        services = services.filter(name__icontains = name_filter)
-        
-    return render(request, 'services/user_service_list.html', {'services': services})
+    if form.is_valid():
+        name_filter = form.cleaned_data.get('name')
+        city_filter = form.cleaned_data.get('city')
+        service_type_filter = form.cleaned_data.get('service_type')
+
+        if name_filter:
+            providers = providers.filter(username__icontains=name_filter)
+
+        if city_filter:
+            providers = providers.filter(city__icontains=city_filter)
+
+        if service_type_filter:
+            providers = providers.filter(service_types__name=service_type_filter)
+
+    return render(request, 'services/user_provider_list.html', {'providers': providers, 'form': form})
+
+def user_view_provider(request, id):
+    provider = get_object_or_404(CustomUser, id=id)
+    return render(request, 'services/user_view_provider.html', {'provider': provider})
+
+
+def user_request_service(request):
+    if request.method == "POST":
+        form = ServiceRequestForm(request.POST)
+        if form.is_valid():
+            service_type = form.cleaned_data['service_type']
+            description = form.cleaned_data['description']
+
+            # Criar request
+            service_request = ServiceRequest.objects.create(
+                requester=request.user,
+                service_type=service_type,
+                description=description
+            )
+
+            #user_coords = (request.user.latitude, request.user.longitude)
+
+            # Filtra provedores por cidade e tipagem correta
+            
+            providers = CustomUser.objects.filter(
+                user_type = 'provider',
+                service_types = service_type,
+                city = request.user.city,
+                #latitude__isnull = False,
+                #longitude__isnull = False
+            )
+            
+            for provider in providers:
+            #provider_coords = (provider.latitude, provider.longitude)
+            #dist_km = geodesic(user_coords, provider_coords).km  
+            #if dist_km < 10:
+            
+                Notification.objects.create(
+                    provider = provider,
+                    request = service_request,
+                    description = service_request.description
+                )
+
+            messages.success(request, f"Solicitação para '{service_type}, {description}' enviada com sucesso!")
+            return redirect("user_request_service")
+    else:
+        form = ServiceRequestForm()
+
+    return render(request, "services/user_request_service.html", {"form": form})

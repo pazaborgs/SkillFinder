@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block 'body' %}
+<div class="container mt-5">
+    <h2 class="text-center">Detalhes do Provedor</h2>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">{{ provider.username }}</h4>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Tipo de Usuário: {{ provider.get_user_type_display }}</h5>
+            <p class="card-text">
+                <strong>Cidade:</strong> {{ provider.city }}
+            </p>
+            <p class="card-text">
+                <strong>Telefone:</strong> {{ provider.phone }}
+            </p>
+            <p class="card-text">
+                <strong>Tipos de Serviço:</strong>
+                {% if provider.service_types.all %}
+                    <ul>
+                        {% for service_type in provider.service_types.all %}
+                            <li>{{ service_type.name }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    Nenhum tipo de serviço disponível.
+                {% endif %}
+            </p>
+            <p class="card-text">
+                <strong>Avaliação Média:</strong> {{ provider.average_rating|default:"N/A" }}
+            </p>
+            <p class="card-text">
+                <strong>Total de Avaliações:</strong> {{ provider.total_ratings|default:"0" }}
+            </p>
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+            <a href="{% url 'user_provider_list' %}" class="btn btn-secondary">Voltar para Provedores</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Solicitar Serviço</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+</head>
+
+<body>
+<div class="container mt-5">
+    <h2 class="mb-4">Solicitar Serviço</h2>
+
+    {% include 'services/messages.html' %}
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            {{ form.service_type.label_tag }}
+            {{ form.service_type }}
+        </div>
+        <div class="mb-3">
+            {{ form.description.label_tag }}
+            {{ form.description }}
+        </div>
+        <button type="submit" class="btn btn-primary">Enviar Solicitação</button>
+    </form>
+</div>
+</body>
+</html>

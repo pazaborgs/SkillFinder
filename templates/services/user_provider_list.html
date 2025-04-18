@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block 'body' %}
+<main>
+    <section class="py-5 text-center">
+        <h1 class="fw-light">Provedores Disponíveis</h1>
+    </section>
+    <div class="album py-5 bg-light">
+        <div class="container">
+            <form method="get" class="mb-4">
+                {{ form.name.label }} {{ form.name }}
+                {{ form.city.label }} {{ form.city }}
+                {{ form.service_type.label }} {{ form.service_type }}
+                <button type="submit" class="btn btn-primary mt-3">Filtrar</button>
+            </form>
+
+            <!-- Botão para solicitar serviço -->
+            <div class="text-center mb-4">
+                <a href="{% url 'user_request_service' %}" class="btn btn-success">Solicitar Serviço</a>
+            </div>
+
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                {% for provider in providers %}
+                    <div class="col">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ provider.username }}</h5>  <!-- Corrigido para usar username -->
+                                <p class="card-text">Cidade: {{ provider.city }}</p>
+                                <p class="card-text">Tipo de Serviço: 
+                                    {% for service_type in provider.service_types.all %}
+                                        {{ service_type.name }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a href="{% url 'user_view_provider' provider.id %}" class="btn btn-sm btn-outline-secondary">Ver</a>
+                                    <small class="text-muted">{{ provider.username }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col">
+                        <div class="card shadow-sm">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Nenhum provedor disponível</h5>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

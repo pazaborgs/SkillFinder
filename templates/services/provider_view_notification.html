@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block 'body' %}
+<div class="container mt-5">
+    <h2 class="text-center">Detalhes da Notificação</h2>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Notificação para {{ notification.provider.username }}</h4>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Serviço: {{ notification.request }}</h5>
+            <p class="card-text">
+                <strong>Data da Notificação:</strong> {{ notification.created_at|date:"d/m/Y H:i" }}
+            </p>
+            <p class="card-text">
+                <strong>Status:</strong> 
+                {% if notification.is_read %}
+                    <span class="text-success">Lido</span>
+                {% else %}
+                    <span class="text-danger">Não Lido</span>
+                {% endif %}
+            </p>
+        </div>
+        <div class="card-footer text-muted d-flex justify-content-between">
+            <a href="{% url 'provider_notification_list' %}" class="btn btn-secondary">Voltar para Notificações</a>
+            <a href="{% url 'provider_delete_notification' notification.id %}" class="btn btn-danger">Excluir Notificação</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
