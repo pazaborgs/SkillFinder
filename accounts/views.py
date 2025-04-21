@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from .forms import CustomUserCreationForm, LoginForm
 #from django.contrib import messages
-from services.models import Service, Notification
+from services.models import Notification
+from services.forms import ProviderFilterForm
 from .models import CustomUser
 from django.conf import settings
 
@@ -58,10 +59,28 @@ def provider_interface(request):
 
 def user_interface(request):
     if request.user.is_authenticated:
-        providers = CustomUser.objects.filter(user_type = 'provider')
+        
+        form = ProviderFilterForm(request.GET)
+        providers = CustomUser .objects.filter(user_type='provider')
+        if form.is_valid():
+            name_filter = form.cleaned_data.get('name')
+            city_filter = form.cleaned_data.get('city')
+            service_type_filter = form.cleaned_data.get('service_type')
+
+            if name_filter:
+                providers = providers.filter(username__icontains=name_filter)
+
+            if city_filter:
+                providers = providers.filter(city__icontains=city_filter)
+
+            if service_type_filter:
+                providers = providers.filter(service_types__name=service_type_filter)
+
+            return render(request, 'services/user_provider_list.html', {'providers': providers, 'form': form})
+        
     else:
         providers = []
-    return render(request, "services/user_provider_list.html", {"providers": providers})
+        return render(request, "services/user_provider_list.html", {"providers": providers})
 
 
 def homepage(request):

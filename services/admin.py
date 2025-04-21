@@ -1,7 +1,6 @@
 from django.contrib import admin
-from .models import Service, ServiceRequest, Notification
+from .models import ServiceRequest, Notification
 
-admin.site.register(Service)
 
 @admin.register(ServiceRequest)
 class ServiceRequestAdmin(admin.ModelAdmin):

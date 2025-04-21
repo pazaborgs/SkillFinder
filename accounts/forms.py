@@ -6,7 +6,7 @@ class CustomUserCreationForm(UserCreationForm):
     service_types = forms.ModelMultipleChoiceField(
         queryset=ServiceType.objects.all(),
         required=False,
-        widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
+        widget=forms.CheckboxSelectMultiple(attrs={'id': 'servicetype-checkbox', 'class': 'form-check-input'}),
         label="Tipos de Serviço (se for prestador)"
     )   
     
@@ -28,7 +28,7 @@ class CustomUserCreationForm(UserCreationForm):
 
     class Meta:
         model = CustomUser 
-        fields = ('username', 'email', 'phone', 'address', 'user_type', 'service_types', 'password1', 'password2')
+        fields = ('username', 'email', 'phone', 'address', 'city', 'user_type', 'service_types', 'password1', 'password2')
 
     def clean(self):
         cleaned_data = super().clean()

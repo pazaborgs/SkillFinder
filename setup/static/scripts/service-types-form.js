@@ -1,9 +1,18 @@
-$(document).ready(function() {
-    $('#id_user_type').change(function() {
-        if ($(this).val() === 'provider') {
-            $('#service-types-field').show();
+$(document).ready(function () {
+    const userTypeField = $('#id_user_type');
+    const serviceTypesField = $('#service-types-field');
+
+    function toggleServiceTypes() {
+        if (userTypeField.val() === 'provider') {
+            serviceTypesField.show();
         } else {
-            $('#service-types-field').hide();
+            serviceTypesField.hide();
         }
-    });
+    }
+
+    // Executa ao carregar
+    toggleServiceTypes();
+
+    // Escuta mudanças
+    userTypeField.on('change', toggleServiceTypes);
 });

@@ -1,17 +1,5 @@
 from django import forms
-from services.models import Service
-from accounts.models import ServiceType
-
-class ServiceForm(forms.ModelForm):
-    class Meta:
-        model = Service
-        exclude = ["owner"]
-        widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'price_range': forms.TextInput(attrs={'class': 'form-control'}),
-            'service_type': forms.Select(attrs={'class': 'form-control'}),
-        }
-        
+from accounts.models import ServiceType  
 
 class ServiceRequestForm(forms.Form):
     service_type = forms.ModelChoiceField(queryset=ServiceType.objects.all())
